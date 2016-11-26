@@ -12,8 +12,9 @@ import lejos.nxt.SensorPort;
 import lejos.nxt.Sound;
 
 public class Main {
-	
-	public static final int DETECTION_COLOUR = Color.BLACK;
+
+	public static final int DETECTION_COLOUR = Color.WHITE;
+	public static final int DETECTION_COLOUR2 = Color.GREEN;
 	
 	private ColorSensor rightSensor, leftSensor;
 	
@@ -21,38 +22,40 @@ public class Main {
 	
 	public Main(){
 		Sound.beep();
+		
 		rightSensor = new ColorSensor(SensorPort.S1, SensorConstants.WHITE);
 		leftSensor = new ColorSensor(SensorPort.S4, SensorConstants.WHITE);
+		
+		movement = new Movement(Direction.STRAIGHT, 1, Movement.MAX_SPEED, true);
 		
 		Button.waitForAnyPress();
 		
 		for(int i = 0 ; i < 5 ; i++){
-			if(i == 4){
-				Sound.twoBeeps();
-			}else{
-				Sound.beep();
-			}
+			Sound.beep();
 			try{Thread.sleep(1000);}catch(Exception e){e.printStackTrace();}
 		}
 		
-		Motor.C.rotate(-120);
+		Motor.C.rotate(-130);
 		
-		movement = new Movement(Direction.STRAIGHT, 1, Movement.MAX_SPEED, true);
+		movement.update();
+		
+		try{Thread.sleep(300);}catch(Exception e){e.printStackTrace();}
+		
+		Motor.C.rotate(130);
+		
 		
 		while(true){
-			
-			
 			digestInputs();
 		}
 	}
 	
 	private void digestInputs(){
-		boolean leftSensorDetect = leftSensor.getColorID() == DETECTION_COLOUR;
-		boolean rightSensorDetect = rightSensor.getColorID() == DETECTION_COLOUR;
+		boolean leftSensorDetect = leftSensor.getColorID() == DETECTION_COLOUR || leftSensor.getColorID() == DETECTION_COLOUR2;
+		boolean rightSensorDetect = rightSensor.getColorID() == DETECTION_COLOUR || leftSensor.getColorID() == DETECTION_COLOUR2;
 		
 		if(leftSensorDetect || rightSensorDetect){
-			movement.set(Direction.STRAIGHT, 0);
 			movement.reverse();
+			movement.set(Direction.STRAIGHT, 0);
 			
 			
 			if(rightSensorDetect && leftSensorDetect){
@@ -73,6 +76,7 @@ public class Main {
 			
 			return;
 		}
+		
 		movement.turnStraight(0.008f);
 	}
 	
@@ -80,7 +84,6 @@ public class Main {
 		Button.ESCAPE.addButtonListener(new ButtonListener() {
 			public void buttonReleased(Button b) {}
 			public void buttonPressed(Button b) {
-				Motor.C.rotate(120);
 				System.exit(0);
 			}
 		});

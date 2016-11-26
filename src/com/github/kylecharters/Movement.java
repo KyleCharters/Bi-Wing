@@ -57,7 +57,7 @@ public class Movement{
 		update();
 	}
 	
-	private void update(){
+	public void update(){
 		updateLeftMotor();
 		updateRightMotor();
 	}
